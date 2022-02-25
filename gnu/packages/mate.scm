@@ -462,33 +462,30 @@ MATE desktop environment.")
 (define-public mate-menus
   (package
     (name "mate-menus")
-    (version "1.24.1")
+    (version "1.26.0")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "mirror://mate/" (version-major+minor version) "/"
                            "mate-menus-" version ".tar.xz"))
        (sha256
-        (base32 "17zc9fn14jykhn30z8iwlw0qwk32ivj6gxgww3xrqvqk0da5yaas"))))
+        (base32 "1r7zf64aclaplz77hkl9kq0xnz6jk1l49z64i8v56c41pm59c283"))))
     (build-system gnu-build-system)
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-after
-          'unpack 'fix-introspection-install-dir
-          (lambda* (#:key outputs #:allow-other-keys)
-            (let ((out (assoc-ref outputs "out")))
-              (substitute* '("configure")
-                (("`\\$PKG_CONFIG --variable=girdir gobject-introspection-1.0`")
-                 (string-append "\"" out "/share/gir-1.0/\""))
-                (("\\$\\(\\$PKG_CONFIG --variable=typelibdir gobject-introspection-1.0\\)")
-                 (string-append out "/lib/girepository-1.0/")))
-              #t))))))
+     (list #:phases
+           #~(modify-phases %standard-phases
+               (add-after
+                   'unpack 'fix-introspection-install-dir
+                 (lambda _
+                   (substitute* '("configure")
+                     (("`\\$PKG_CONFIG --variable=girdir gobject-introspection-1.0`")
+                      (string-append "\"" #$output "/share/gir-1.0/\""))
+                     (("\\$\\(\\$PKG_CONFIG --variable=typelibdir gobject-introspection-1.0\\)")
+                      (string-append #$output "/lib/girepository-1.0/"))))))))
     (native-inputs
      (list pkg-config intltool gobject-introspection))
     (inputs
-     `(("glib" ,glib)
-       ("python" ,python-2)))
+     (list glib python-2))
     (home-page "https://mate-desktop.org/")
     (synopsis "Freedesktop menu specification implementation for MATE")
     (description
