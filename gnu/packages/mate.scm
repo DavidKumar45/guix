@@ -955,14 +955,14 @@ of various aspects of your desktop.")
 (define-public marco
   (package
     (name "marco")
-    (version "1.24.1")
+    (version "1.26.0")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "mirror://mate/" (version-major+minor version) "/"
                            name "-" version ".tar.xz"))
        (sha256
-        (base32 "109b41pjrc1b4slw6sx1lakdhrc46x829vczzk4bz3j15kcszg54"))))
+        (base32 "01avxrg2fc6grfrp6hl8b0im4scy9xf6011swfrhli87ig6hhg7n"))))
     (build-system glib-or-gtk-build-system)
     (native-inputs
      (list pkg-config
