@@ -199,14 +199,14 @@ from Mint-X-F and Faenza-Fresh icon packs.")
 (define-public mate-themes
   (package
     (name "mate-themes")
-    (version "3.22.21")
+    (version "3.22.23")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "mirror://mate/themes/" (version-major+minor version)
                            "/mate-themes-" version ".tar.xz"))
        (sha256
-        (base32 "051g2vq817g84yrqzf7hjcqr4xrghnw1rprjd6jf5mhhzmwcas6n"))))
+        (base32 "1avgzccdmr7y18rnp3xrhwk82alv2dlig3wh7ivgahcqdiiavrb1"))))
     (build-system gnu-build-system)
     (native-inputs
      (list pkg-config intltool gdk-pixbuf ; gdk-pixbuf+svg isn't needed
