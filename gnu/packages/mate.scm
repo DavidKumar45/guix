@@ -1302,37 +1302,37 @@ can be used as backgrounds in the MATE Desktop environment.")
 (define-public engrampa
   (package
     (name "engrampa")
-    (version "1.24.1")
+    (version "1.26.0")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "mirror://mate/" (version-major+minor version) "/"
                            "engrampa-" version ".tar.xz"))
        (sha256
-        (base32 "0akjnz85qkpiqgj1ccn41rzbfid4l3r3nsm4s9s779ilzd7f097y"))))
+        (base32 "1qsy0ynhj1v0kyn3g3yf62g31rwxmpglfh9xh0w5lc9j5k1b5kcp"))))
     (build-system glib-or-gtk-build-system)
     (arguments
-     `(#:configure-flags (list "--disable-schemas-compile"
-                               "--disable-run-in-place"
-                               "--enable-magic"
-                               "--enable-packagekit"
-                               (string-append "--with-cajadir="
-                                              (assoc-ref %outputs "out")
-                                              "/lib/caja/extensions-2.0/"))
-       #:phases
-       (modify-phases %standard-phases
-         (add-before 'install 'skip-gtk-update-icon-cache
-           ;; Don't create 'icon-theme.cache'.
-           (lambda _
-             (substitute* "data/Makefile"
-               (("gtk-update-icon-cache") "true"))
-             #t)))))
+     (list #:configure-flags
+           #~(list "--disable-schemas-compile"
+                   "--disable-run-in-place"
+                   "--enable-magic"
+                   "--enable-packagekit"
+                   (string-append "--with-cajadir="
+                                  #$output
+                                  "/lib/caja/extensions-2.0/"))
+           #:phases
+           #~(modify-phases %standard-phases
+               (add-before 'install 'skip-gtk-update-icon-cache
+                 ;; Don't create 'icon-theme.cache'.
+                 (lambda _
+                   (substitute* "data/Makefile"
+                     (("gtk-update-icon-cache") "true")))))))
     (native-inputs
-     `(("gettext" ,gettext-minimal)
-       ("gtk-doc" ,gtk-doc)
-       ("intltool" ,intltool)
-       ("pkg-config" ,pkg-config)
-       ("yelp-tools" ,yelp-tools)))
+     (list gettext-minimal
+           gtk-doc
+           intltool
+           pkg-config
+           yelp-tools))
     (inputs
      (list caja
            file
