@@ -830,35 +830,37 @@ icons on the MATE desktop.  It works on local and remote file systems.")
 (define-public caja-extensions
   (package
     (name "caja-extensions")
-    (version "1.24.1")
+    (version "1.26.0")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "mirror://mate/" (version-major+minor version) "/"
                            "caja-extensions-" version ".tar.xz"))
        (sha256
-        (base32 "13jkynanqj8snys0if8lv6yx1y0jrm778s2152n4x65hsghc6cw5"))))
+        (base32 "03zwv3yl5553cnp6jjn7vr4l28dcdhsap7qimlrbvy20119kj5gh"))))
     (build-system glib-or-gtk-build-system)
     (arguments
-     `(#:configure-flags (list "--enable-sendto"
-                               ;; TODO: package "gupnp" to enable 'upnp', package
-                               ;; "gksu" to enable 'gksu'.
-                               (string-append "--with-sendto-plugins=removable-devices,"
-                                              "caja-burn,emailclient,pidgin,gajim")
-                               "--enable-image-converter"
-                               "--enable-open-terminal" "--enable-share"
-                               "--enable-wallpaper" "--enable-xattr-tags"
-                               (string-append "--with-cajadir="
-                                              (assoc-ref %outputs "out")
-                                              "/lib/caja/extensions-2.0/"))))
+     (list #:configure-flags
+           #~(list "--enable-sendto"
+                   ;; TODO: package "gupnp" to enable 'upnp', package
+                   ;; "gksu" to enable 'gksu'.
+                   (string-append "--with-sendto-plugins=removable-devices,"
+                                  "caja-burn,emailclient,pidgin,gajim")
+                   "--enable-image-converter"
+                   "--enable-open-terminal"
+                   "--enable-share"
+                   "--enable-wallpaper"
+                   "--enable-xattr-tags"
+                   (string-append "--with-cajadir=" #$output
+                                  "/lib/caja/extensions-2.0/"))))
     (native-inputs
-     `(("intltool" ,intltool)
-       ("gettext" ,gettext-minimal)
-       ("glib:bin" ,glib "bin")
-       ("gobject-introspection" ,gobject-introspection)
-       ("gtk-doc" ,gtk-doc)
-       ("libxml2" ,libxml2)
-       ("pkg-config" ,pkg-config)))
+     (list intltool
+           gettext-minimal
+           (list glib "bin")
+           gobject-introspection
+           gtk-doc
+           libxml2
+           pkg-config))
     (inputs
      (list attr
            brasero
