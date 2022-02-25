@@ -28,6 +28,7 @@
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages)
   #:use-module (guix download)
+  #:use-module (guix gexp)
   #:use-module (guix utils)
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system glib-or-gtk)
@@ -252,36 +253,35 @@ desktop and the mate-about program.")
 (define-public libmateweather
   (package
     (name "libmateweather")
-    (version "1.24.1")
+    (version "1.26.0")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "mirror://mate/" (version-major+minor version) "/"
                            "libmateweather-" version ".tar.xz"))
        (sha256
-        (base32 "02d7c59pami1fzxg73mp6risa9hvsdpgs68f62wkg09nrppzsk4v"))))
+        (base32 "05bvc220p135l6qnhh3qskljxffds0f7fjbjnrpq524w149rgzd7"))))
     (build-system gnu-build-system)
     (arguments
-     '(#:configure-flags
-       (list (string-append "--with-zoneinfo-dir="
-                            (assoc-ref %build-inputs "tzdata")
-                            "/share/zoneinfo"))
-       #:phases
-       (modify-phases %standard-phases
-         (add-before 'check 'fix-tzdata-location
-          (lambda* (#:key inputs #:allow-other-keys)
-            (substitute* "data/check-timezones.sh"
-              (("/usr/share/zoneinfo/zone.tab")
-               (search-input-file inputs "/share/zoneinfo/zone.tab"))))))))
+     (list
+      #:configure-flags
+      #~(list (string-append "--with-zoneinfo-dir=" #$tzdata "/share/zoneinfo"))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'fix-tzdata-location
+            (lambda* (#:key inputs #:allow-other-keys)
+              (substitute* "data/check-timezones.sh"
+                (("/usr/share/zoneinfo/zone.tab")
+                 (search-input-file inputs "/share/zoneinfo/zone.tab"))))))))
     (native-inputs
-     `(("pkg-config" ,pkg-config)
-       ("intltool" ,intltool)
-       ("dconf" ,dconf)
-       ("glib:bin" ,glib "bin")))
+     (list pkg-config
+           intltool
+           dconf
+           (list glib "bin")))
     (inputs
      (list gtk+ tzdata))
     (propagated-inputs
-      ;; both of these are requires.private in mateweather.pc
+     ;; both of these are requires.private in mateweather.pc
      (list libsoup-minimal-2 libxml2))
     (home-page "https://mate-desktop.org/")
     (synopsis "MATE library for weather information from the Internet")
