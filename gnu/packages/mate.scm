@@ -885,28 +885,27 @@ icons on the MATE desktop.  It works on local and remote file systems.")
 (define-public mate-control-center
   (package
     (name "mate-control-center")
-    (version "1.24.1")
+    (version "1.26.0")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "mirror://mate/" (version-major+minor version) "/"
                            "mate-control-center-" version ".tar.xz"))
        (sha256
-        (base32 "08bai47fsmbxlw2lhig9n6c8sxr24ixkd1spq3j0635yzcqighb0"))))
+        (base32 "0jhkn0vaz8glji4j5ar6im8l2wf40kssl07gfkz40rcgfzm18rr8"))))
     (build-system glib-or-gtk-build-system)
     (arguments
-     '(#:phases (modify-phases %standard-phases
-                  (add-before 'build 'fix-polkit-action
-                    (lambda* (#:key outputs #:allow-other-keys)
-                      ;; Make sure the polkit file refers to the right
-                      ;; executable.
-                      (let ((out (assoc-ref outputs "out")))
-                        (substitute*
-                            '("capplets/display/org.mate.randr.policy.in"
-                              "capplets/display/org.mate.randr.policy")
-                          (("/usr/sbin")
-                           (string-append out "/sbin")))
-                        #t))))))
+     (list #:phases
+           #~(modify-phases %standard-phases
+               (add-before 'build 'fix-polkit-action
+                 (lambda _
+                   ;; Make sure the polkit file refers to the right
+                   ;; executable.
+                   (substitute*
+                       '("capplets/display/org.mate.randr.policy.in"
+                         "capplets/display/org.mate.randr.policy")
+                     (("/usr/sbin")
+                      (string-append #$output "/sbin"))))))))
     (native-inputs
      (list pkg-config
            intltool
@@ -916,34 +915,34 @@ icons on the MATE desktop.  It works on local and remote file systems.")
            xmodmap
            gobject-introspection))
     (inputs
-     `(("atk" ,atk)
-       ("cairo" ,cairo)
-       ("caja" ,caja)
-       ("dconf" ,dconf)
-       ("dbus" ,dbus)
-       ("dbus-glib" ,dbus-glib)
-       ("fontconfig" ,fontconfig)
-       ("freetype" ,freetype)
-       ("glib" ,glib)
-       ("gtk+" ,gtk+)
-       ("libcanberra" ,libcanberra)
-       ("libmatekbd" ,libmatekbd)
-       ("libx11" ,libx11)
-       ("libxcursor" ,libxcursor)
-       ("libxext" ,libxext)
-       ("libxi" ,libxi)
-       ("libxklavier" ,libxklavier)
-       ("libxml2" ,libxml2)
-       ("libxrandr" ,libxrandr)
-       ("libxrender" ,libxrender)
-       ("libxscrnsaver" ,libxscrnsaver)
-       ("marco" ,marco)
-       ("mate-desktop" ,mate-desktop)
-       ("mate-menus" ,mate-menus)
-       ("mate-settings-daemon" ,mate-settings-daemon)
-       ("pango" ,pango)
-       ("polkit" ,polkit)
-       ("startup-notification" ,startup-notification)))
+     (list atk
+           cairo
+           caja
+           dconf
+           dbus
+           dbus-glib
+           fontconfig
+           freetype
+           glib
+           gtk+
+           libcanberra
+           libmatekbd
+           libx11
+           libxcursor
+           libxext
+           libxi
+           libxklavier
+           libxml2
+           libxrandr
+           libxrender
+           libxscrnsaver
+           marco
+           mate-desktop
+           mate-menus
+           mate-settings-daemon
+           pango
+           polkit
+           startup-notification))
     (propagated-inputs
      (list (librsvg-for-system)))        ;mate-slab.pc
     (home-page "https://mate-desktop.org/")
