@@ -1004,7 +1004,7 @@ for use with MATE or as a standalone window manager.")
 (define-public mate-user-guide
   (package
     (name "mate-user-guide")
-    (version "1.24.0")
+    (version "1.26.0")
     (source
      (origin
        (method url-fetch)
@@ -1012,24 +1012,22 @@ for use with MATE or as a standalone window manager.")
                            name "-" version ".tar.xz"))
        (sha256
         (base32
-         "0ddxya84iydvy85dbqls0wmz2rph87wri3rsdhv4rkbhh5g4sd7f"))))
+         "1h620ngryqc4m8ybvc92ba8404djnm0l65f34mlw38g9ad8d9085"))))
     (build-system gnu-build-system)
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'adjust-desktop-file
-           (lambda* (#:key inputs #:allow-other-keys)
-             (let* ((yelp (assoc-ref inputs "yelp")))
-               (substitute* "mate-user-guide.desktop.in.in"
-                 (("yelp")
-                  (string-append yelp "/bin/yelp"))))
-             #t)))))
+     (list #:phases
+           #~(modify-phases %standard-phases
+               (add-after 'unpack 'adjust-desktop-file
+                 (lambda _
+                   (substitute* "mate-user-guide.desktop.in.in"
+                     (("yelp")
+                      (string-append #$yelp "/bin/yelp"))))))))
     (native-inputs
-     `(("pkg-config" ,pkg-config)
-       ("intltool" ,intltool)
-       ("gettext" ,gettext-minimal)
-       ("yelp-tools" ,yelp-tools)
-       ("yelp-xsl" ,yelp-xsl)))
+     (list pkg-config
+           intltool
+           gettext-minimal
+           yelp-tools
+           yelp-xsl))
     (inputs
      (list yelp))
     (home-page "https://mate-desktop.org/")
