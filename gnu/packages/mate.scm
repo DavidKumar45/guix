@@ -1132,42 +1132,41 @@ Re-decorates windows on un-maximise.
 (define-public mate-screensaver
   (package
     (name "mate-screensaver")
-    (version "1.24.1")
+    (version "1.26.1")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "mirror://mate/" (version-major+minor version) "/"
                            "mate-screensaver-" version ".tar.xz"))
        (sha256
-        (base32 "0imb1z2yvz1h95dzq396c569kkxys9mb2dyc6qxxxcnc5w02a2dw"))))
+        (base32 "1g5qb6bf08726166c12n554kwxb9v1vgg6za6ggai7m5lhgb5gag"))))
     (build-system glib-or-gtk-build-system)
     (arguments
-     `(#:configure-flags
-       ;; FIXME: There is a permissions problem with screen locking
-       ;; which effectively locks you out completely. Enable locking
-       ;; once this has been fixed.
-       (list "--enable-locking" "--with-kbd-layout-indicator"
-             "--with-xf86gamma-ext" "--enable-pam"
-             "--disable-schemas-compile" "--without-console-kit")
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'autoconf
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let* ((out (assoc-ref outputs "out"))
-                    (dbus-dir (string-append out "/share/dbus-1/services")))
-             (setenv "SHELL" (which "sh"))
-             (setenv "CONFIG_SHELL" (which "sh"))
-             (substitute* "configure"
-               (("dbus-1") ""))))))))
+     (list
+      #:configure-flags
+      ;; FIXME: There is a permissions problem with screen locking
+      ;; which effectively locks you out completely. Enable locking
+      ;; once this has been fixed.
+      #~(list "--enable-locking" "--with-kbd-layout-indicator"
+              "--with-xf86gamma-ext" "--enable-pam"
+              "--disable-schemas-compile" "--without-console-kit")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'autoconf
+            (lambda _
+              (setenv "SHELL" (which "sh"))
+              (setenv "CONFIG_SHELL" (which "sh"))
+              (substitute* "configure"
+                (("dbus-1") "")))))))
     (native-inputs
-     `(("automake" ,automake)
-       ("autoconf" ,autoconf)
-       ("gettext" ,gettext-minimal)
-       ("intltool" ,intltool)
-       ("mate-common" ,mate-common)
-       ("pkg-config" ,pkg-config)
-       ("which" ,which)
-       ("xorgproto" ,xorgproto)))
+     (list automake
+           autoconf
+           gettext-minimal
+           intltool
+           mate-common
+           pkg-config
+           which
+           xorgproto))
     (inputs
      (list cairo
            dconf
