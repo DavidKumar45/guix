@@ -371,14 +371,14 @@ configuration program to choose applications starting on login.")
 (define-public mate-settings-daemon
   (package
     (name "mate-settings-daemon")
-    (version "1.24.1")
+    (version "1.26.0")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "mirror://mate/" (version-major+minor version) "/"
                            "mate-settings-daemon-" version ".tar.xz"))
        (sha256
-        (base32 "0n1ywr3ir5p536s7azdbw2mh40ylqlpx3a74mjrivbms1rpjxyab"))))
+        (base32 "0hbdwqagxh1mdpxfdqr1ps3yqvk0v0c5zm0bwk56y6l1zwbs0ymp"))))
     (build-system glib-or-gtk-build-system)
     (native-inputs
      (list pkg-config intltool gobject-introspection))
