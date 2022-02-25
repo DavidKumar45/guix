@@ -772,7 +772,7 @@ infamous 'Wanda the Fish'.")
 (define-public caja
   (package
     (name "caja")
-    (version "1.24.0")
+    (version "1.26.0")
     (source
      (origin
        (method url-fetch)
@@ -780,27 +780,27 @@ infamous 'Wanda the Fish'.")
                            name "-" version ".tar.xz"))
        (sha256
         (base32
-         "1cnfy481hcwjv3ia3kw0d4h7ga8cng0pqm3z349v4qcmfdapmqc0"))))
+         "1m0ai2r8b2mvlr8bqj9n6vg1pwzlwa46fqpq206wgyx5sgxac052"))))
     (build-system glib-or-gtk-build-system)
     (arguments
-     `(#:configure-flags '("--disable-update-mimedb")
-       #:tests? #f ; tests fail even with display set
-       #:phases
-       (modify-phases %standard-phases
-         (add-before 'check 'pre-check
-           (lambda _
-             ;; Tests require a running X server.
-             (system "Xvfb :1 &")
-             (setenv "DISPLAY" ":1")
-             ;; For the missing /etc/machine-id.
-             (setenv "DBUS_FATAL_WARNINGS" "0")
-             #t)))))
+     (list
+      #:configure-flags #~(list "--disable-update-mimedb")
+      #:tests? #f ; tests fail even with display set
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'check 'pre-check
+            (lambda _
+              ;; Tests require a running X server.
+              (system "Xvfb :1 &")
+              (setenv "DISPLAY" ":1")
+              ;; For the missing /etc/machine-id.
+              (setenv "DBUS_FATAL_WARNINGS" "0"))))))
     (native-inputs
-     `(("pkg-config" ,pkg-config)
-       ("intltool" ,intltool)
-       ("glib:bin" ,glib "bin")
-       ("xorg-server" ,xorg-server)
-       ("gobject-introspection" ,gobject-introspection)))
+     (list pkg-config
+           intltool
+           `(,glib "bin")
+           xorg-server
+           gobject-introspection))
     (inputs
      (list exempi
            gtk+
