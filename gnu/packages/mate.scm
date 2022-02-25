@@ -170,24 +170,24 @@ actions.")
          "000vr9cnbl2qlysf2gyg1lsjirqdzmwrnh6d3hyrsfc0r2vh4wna"))))
     (build-system gnu-build-system)
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'autoconf
-           (lambda _
-             (setenv "SHELL" (which "sh"))
-             (setenv "CONFIG_SHELL" (which "sh"))
-             (invoke "sh" "autogen.sh"))))))
+     (list #:phases
+           #~(modify-phases %standard-phases
+               (add-after 'unpack 'autoconf
+                 (lambda _
+                   (setenv "SHELL" (which "sh"))
+                   (setenv "CONFIG_SHELL" (which "sh"))
+                   (invoke "sh" "autogen.sh"))))))
     (native-inputs
      ;; autoconf-wrapper is required due to the non-standard
      ;; 'autoconf phase.
-     `(("autoconf" ,autoconf-wrapper)
-       ("automake" ,automake)
-       ("intltool" ,intltool)
-       ("icon-naming-utils" ,icon-naming-utils)
-       ("libtool" ,libtool)
-       ("mate-common" ,mate-common)
-       ("pkg-config" ,pkg-config)
-       ("which" ,which)))
+     (list autoconf-wrapper
+           automake
+           intltool
+           icon-naming-utils
+           libtool
+           mate-common
+           pkg-config
+           which))
     (home-page "https://mate-desktop.org/")
     (synopsis "MATE desktop environment icon theme faenza")
     (description
