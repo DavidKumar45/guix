@@ -601,41 +601,38 @@ mate-volume-control, a MATE volume control application and applet.")
 (define-public mate-panel
   (package
     (name "mate-panel")
-    (version "1.24.1")
+    (version "1.26.2")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "mirror://mate/" (version-major+minor version) "/"
                            name "-" version ".tar.xz"))
        (sha256
-        (base32 "0xblqrhfazd01h0jdmx4hvavkb7f9anbd4rjsk5r6wxhp027l64l"))))
+        (base32 "042lw29y816hr0hhyrncvvs14afqy6109van0v67d7n5i66gki5f"))))
     (build-system glib-or-gtk-build-system)
     (arguments
-     `(#:configure-flags
-       (list (string-append "--with-zoneinfo-dir="
-                            (assoc-ref %build-inputs "tzdata")
-                            "/share/zoneinfo")
-             "--with-in-process-applets=all")
-       #:phases
-       (modify-phases %standard-phases
-         (add-before 'configure 'fix-timezone-path
-           (lambda* (#:key inputs #:allow-other-keys)
-             (let* ((tzdata (assoc-ref inputs "tzdata")))
-               (substitute* "applets/clock/system-timezone.h"
-                 (("/usr/share/lib/zoneinfo/tab")
-                  (string-append tzdata "/share/zoneinfo/zone.tab"))
-                 (("/usr/share/zoneinfo")
-                  (string-append tzdata "/share/zoneinfo"))))
-             #t))
-         (add-after 'unpack 'fix-introspection-install-dir
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let ((out (assoc-ref outputs "out")))
-               (substitute* '("configure")
-                 (("`\\$PKG_CONFIG --variable=girdir gobject-introspection-1.0`")
-                  (string-append "\"" out "/share/gir-1.0/\""))
-                 (("\\$\\(\\$PKG_CONFIG --variable=typelibdir gobject-introspection-1.0\\)")
-                  (string-append out "/lib/girepository-1.0/")))
-               #t))))))
+     (list
+      #:configure-flags
+      #~(list (string-append "--with-zoneinfo-dir="
+                             #$tzdata
+                             "/share/zoneinfo")
+              "--with-in-process-applets=all")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-before 'configure 'fix-timezone-path
+            (lambda _
+              (substitute* "applets/clock/system-timezone.h"
+                (("/usr/share/lib/zoneinfo/tab")
+                 (string-append #$tzdata "/share/zoneinfo/zone.tab"))
+                (("/usr/share/zoneinfo")
+                 (string-append #$tzdata "/share/zoneinfo")))))
+          (add-after 'unpack 'fix-introspection-install-dir
+            (lambda _
+              (substitute* '("configure")
+                (("`\\$PKG_CONFIG --variable=girdir gobject-introspection-1.0`")
+                 (string-append "\"" #$output "/share/gir-1.0/\""))
+                (("\\$\\(\\$PKG_CONFIG --variable=typelibdir gobject-introspection-1.0\\)")
+                 (string-append #$output "/lib/girepository-1.0/"))))))))
     (native-inputs
      (list pkg-config intltool itstool xtrans gobject-introspection))
     (inputs
