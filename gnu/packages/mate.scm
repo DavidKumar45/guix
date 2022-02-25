@@ -1354,34 +1354,34 @@ can be used as backgrounds in the MATE Desktop environment.")
 (define-public pluma
   (package
     (name "pluma")
-    (version "1.24.1")
+    (version "1.26.0")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "mirror://mate/" (version-major+minor version) "/"
                            name "-" version ".tar.xz"))
        (sha256
-        (base32 "1sgc5f480icr2ans6gd3akvcax58mr4jp3zjk3xn7bx1mw9i299f"))))
+        (base32 "0lway12q2xygiwjgrx7chgka838jbnmlzz98g7agag1rwzd481ii"))))
     (build-system glib-or-gtk-build-system)
     (arguments
      `(; Tests can not succeed.
        ;; https://github.com/mate-desktop/mate-text-editor/issues/33
        #:tests? #f))
     (native-inputs
-     `(("gettext" ,gettext-minimal)
-       ("gtk-doc" ,gtk-doc)
-       ("gobject-introspection" ,gobject-introspection)
-       ("intltool" ,intltool)
-       ("libtool" ,libtool)
-       ("pkg-config" ,pkg-config)
-       ("yelp-tools" ,yelp-tools)))
+     (list gettext-minimal
+           gtk-doc
+           gobject-introspection
+           intltool
+           libtool
+           pkg-config
+           yelp-tools))
     (inputs
      (list atk
            cairo
            enchant-1.6
            glib
            gtk+
-           gtksourceview-3
+           gtksourceview
            gdk-pixbuf
            iso-codes
            libcanberra
