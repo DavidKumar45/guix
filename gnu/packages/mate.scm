@@ -97,14 +97,14 @@ MATE applications.")
 (define-public mate-power-manager
   (package
     (name "mate-power-manager")
-    (version "1.24.2")
+    (version "1.26.0")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "mirror://mate/" (version-major+minor version) "/"
                            "mate-power-manager-" version ".tar.xz"))
        (sha256
-        (base32 "0fni41p3kraxwjnx9l5mdspng0zib1gfdxwlaiyq31mh4g79yjyj"))))
+        (base32 "0ybvwv24g8awxjl2asgvx6l2ghn4limcm48ylha68dkpy3607di6"))))
     (build-system gnu-build-system)
     (native-inputs
      (list pkg-config
@@ -122,6 +122,7 @@ MATE applications.")
            libnotify
            mate-panel
            libxrandr
+           libsecret
            libcanberra
            upower))
     (home-page "https://mate-desktop.org/")
