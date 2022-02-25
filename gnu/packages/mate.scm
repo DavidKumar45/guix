@@ -670,7 +670,7 @@ infamous 'Wanda the Fish'.")
 (define-public atril
   (package
     (name "atril")
-    (version "1.24.0")
+    (version "1.26.0")
     (source
      (origin
        (method url-fetch)
@@ -678,92 +678,86 @@ infamous 'Wanda the Fish'.")
                            name "-" version ".tar.xz"))
        (sha256
         (base32
-         "0967gxw7h2qh2kpwl0jgv58hicz6aa92kr12mnykbpikad25s95y"))))
+         "0pz44k3axhjhhwfrfvnwvxak1dmjkwqs63rhrbcaagyymrp7cpki"))))
     (build-system glib-or-gtk-build-system)
     (arguments
-     `(#:configure-flags (list (string-append "--with-openjpeg="
-                                              (assoc-ref %build-inputs "openjpeg"))
-                               "--enable-introspection"
-                               "--disable-schemas-compile"
-                               ;; FIXME: Enable build of Caja extensions.
-                               "--disable-caja")
-       #:tests? #f
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'fix-mathjax-path
-           (lambda _
-             (let* ((mathjax (assoc-ref %build-inputs "js-mathjax"))
-                    (mathjax-path (string-append mathjax
-                                                 "/share/javascript/mathjax")))
-               (substitute* "backend/epub/epub-document.c"
-                 (("/usr/share/javascript/mathjax")
-                  mathjax-path)))
-             #t))
-         (add-after 'unpack 'fix-introspection-install-dir
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let ((out (assoc-ref outputs "out")))
-               (substitute* '("configure")
-                 (("\\$\\(\\$PKG_CONFIG --variable=girdir gobject-introspection-1.0\\)")
-                  (string-append "\"" out "/share/gir-1.0/\""))
-                 (("\\$\\(\\$PKG_CONFIG --variable=typelibdir gobject-introspection-1.0\\)")
-                  (string-append out "/lib/girepository-1.0/")))
-               #t)))
-         (add-before 'install 'skip-gtk-update-icon-cache
-           ;; Don't create 'icon-theme.cache'.
-           (lambda _
-             (substitute* "data/Makefile"
-               (("gtk-update-icon-cache") "true"))
-             #t)))))
+     (list
+      #:configure-flags
+      #~(list (string-append "--with-openjpeg=" #$openjpeg "openjpeg")
+              "--enable-introspection"
+              "--disable-schemas-compile"
+              ;; FIXME: Enable build of Caja extensions.
+              "--disable-caja")
+      #:tests? #f
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'fix-mathjax-path
+            (lambda _
+              (substitute* "backend/epub/epub-document.c"
+                (("/usr/share/javascript/mathjax")
+                 (string-append #$js-mathjax "/share/javascript/mathjax")))))
+          (add-after 'unpack 'fix-introspection-install-dir
+            (lambda _
+              (substitute* '("configure")
+                (("\\$\\(\\$PKG_CONFIG --variable=girdir gobject-introspection-1.0\\)")
+                 (string-append "\"" #$output "/share/gir-1.0/\""))
+                (("\\$\\(\\$PKG_CONFIG --variable=typelibdir gobject-introspection-1.0\\)")
+                 (string-append #$output "/lib/girepository-1.0/")))))
+          (add-before 'install 'skip-gtk-update-icon-cache
+            ;; Don't create 'icon-theme.cache'.
+            (lambda _
+              (substitute* "data/Makefile"
+                (("gtk-update-icon-cache") "true")))))))
     (native-inputs
-     `(("pkg-config" ,pkg-config)
-       ("intltool" ,intltool)
-       ("itstool" ,itstool)
-       ("yelp-tools" ,yelp-tools)
-       ("glib:bin" ,glib "bin")
-       ("gobject-introspection" ,gobject-introspection)
-       ("gtk-doc" ,gtk-doc)
-       ("texlive-bin" ,texlive-bin) ;synctex
-       ("xmllint" ,libxml2)
-       ("zlib" ,zlib)))
+     (list pkg-config
+           intltool
+           itstool
+           yelp-tools
+           (list glib "bin")
+           gobject-introspection
+           gtk-doc
+           texlive-bin ;synctex
+           libxml2
+           zlib))
     (inputs
-     `(("atk" ,atk)
-       ("cairo" ,cairo)
-       ("caja" ,caja)
-       ("dconf" ,dconf)
-       ("dbus" ,dbus)
-       ("dbus-glib" ,dbus-glib)
-       ("djvulibre" ,djvulibre)
-       ("fontconfig" ,fontconfig)
-       ("freetype" ,freetype)
-       ("ghostscript" ,ghostscript)
-       ("glib" ,glib)
-       ("gtk+" ,gtk+)
-       ("js-mathjax" ,js-mathjax)
-       ("libcanberra" ,libcanberra)
-       ("libsecret" ,libsecret)
-       ("libspectre" ,libspectre)
-       ("libtiff" ,libtiff)
-       ("libx11" ,libx11)
-       ("libice" ,libice)
-       ("libsm" ,libsm)
-       ("libgxps" ,libgxps)
-       ("libjpeg" ,libjpeg-turbo)
-       ("libxml2" ,libxml2)
-       ("dogtail" ,python-dogtail)
-       ("shared-mime-info" ,shared-mime-info)
-       ("gdk-pixbuf" ,gdk-pixbuf)
-       ("gsettings-desktop-schemas" ,gsettings-desktop-schemas)
-       ("libgnome-keyring" ,libgnome-keyring)
-       ("libarchive" ,libarchive)
-       ("marco" ,marco)
-       ("openjpeg" ,openjpeg)
-       ("pango" ,pango)
-       ;;("texlive" ,texlive)
-       ;; TODO:
-       ;;   Build libkpathsea as a shared library for DVI support.
-       ;; ("libkpathsea" ,texlive-bin)
-       ("poppler" ,poppler)
-       ("webkitgtk" ,webkitgtk)))
+     (list atk
+           cairo
+           caja
+           dconf
+           dbus
+           dbus-glib
+           djvulibre
+           fontconfig
+           freetype
+           ghostscript
+           glib
+           gtk+
+           js-mathjax
+           libcanberra
+           libsecret
+           libspectre
+           libtiff
+           libx11
+           libice
+           libsm
+           libgxps
+           libjpeg-turbo
+           libxml2
+           python-dogtail
+           shared-mime-info
+           gdk-pixbuf
+           gsettings-desktop-schemas
+           libgnome-keyring
+           libarchive
+           marco
+           openjpeg
+           pango
+           ;; texlive
+           ;; TODO:
+           ;;   Build libkpathsea as a shared library for DVI support.
+           ;; ("libkpathsea" ,texlive-bin)
+           poppler
+           webkitgtk))
     (home-page "https://mate-desktop.org")
     (synopsis "Document viewer for Mate")
     (description
