@@ -912,13 +912,13 @@ icons on the MATE desktop.  It works on local and remote file systems.")
     (inputs
      (list atk
            cairo
-           caja
            dconf
            dbus
            dbus-glib
            fontconfig
            freetype
            glib
+           gsettings-desktop-schemas
            gtk+
            libcanberra
            libmatekbd
@@ -935,6 +935,9 @@ icons on the MATE desktop.  It works on local and remote file systems.")
            mate-desktop
            mate-menus
            mate-settings-daemon
+           ;; FIXME: Move caja behind mate-*, if not, its path will not be
+           ;; included into $XDG_DATA_DIRS in wrap programs.
+           caja
            pango
            polkit
            startup-notification))
