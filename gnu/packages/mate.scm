@@ -507,6 +507,9 @@ assorted menu related utility programs.")
        (sha256
         (base32 "0xy9dwiqvmimqshbfq80jxq65aznlgx491lqq8rl4x8c9sdl7q5p"))))
     (build-system glib-or-gtk-build-system)
+    (arguments
+     (list #:configure-flags
+           #~(list (string-append "--libexecdir=" #$output "/lib/mate-applets"))))
     (native-inputs
      (list pkg-config
            intltool
