@@ -658,6 +658,10 @@ mate-volume-control, a MATE volume control application and applet.")
            pango
            tzdata
            wayland))
+    (native-search-paths
+     (list (search-path-specification
+            (variable "MATE_PANEL_APPLETS_DIR")
+            (files (list "share/mate-panel/applets")))))
     (home-page "https://mate-desktop.org/")
     (synopsis "Panel for MATE")
     (description
