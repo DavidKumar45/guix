@@ -38,6 +38,7 @@
   #:use-module (gnu packages autotools)
   #:use-module (gnu packages backup)
   #:use-module (gnu packages base)
+  #:use-module (gnu packages check)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages djvu)
   #:use-module (gnu packages docbook)
@@ -828,6 +829,47 @@ icons on the MATE desktop.  It works on local and remote file systems.")
     ;; does not exist. It is safe to assume that this is of no concern
     ;; for us.
     (license license:gpl2+)))
+
+(define-public caja-actions
+  (package
+    (name "caja-actions")
+    (version "1.26.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
+                           "caja-actions-" version ".tar.xz"))
+       (sha256
+        (base32 "0iv8pl61kg8csdcby4f4iyswdb8bnhmydbkxhwd6mj7gsgh0mf6c"))))
+    (build-system glib-or-gtk-build-system)
+    (arguments
+     (list #:configure-flags
+           #~(list (string-append "--with-caja-extdir=" #$output
+                                  "/lib/caja/extensions-2.0"))))
+    (native-inputs
+     (list intltool
+           gettext-minimal
+           (list glib "bin")
+           gobject-introspection
+           gtk-doc
+           libxml2
+           pkg-config))
+    (inputs
+     (list caja
+           gtk+
+           libgtop
+           libsm
+           mate-desktop
+           (list util-linux "lib") ;libuuid
+           yelp-tools))
+    (home-page "https://mate-desktop.org/")
+    (synopsis "Extension for the File manager Caja")
+    (description
+     "Caja-actions is an extension for Caja file manager.
+which allows the user to add arbitrary program to be launched through the
+Caja file manager popup menu of selected files.")
+    (license license:gpl2+)))
+
 
 (define-public caja-extensions
   (package
