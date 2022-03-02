@@ -694,9 +694,7 @@ infamous 'Wanda the Fish'.")
       #:configure-flags
       #~(list (string-append "--with-openjpeg=" #$openjpeg "openjpeg")
               "--enable-introspection"
-              "--disable-schemas-compile"
-              ;; FIXME: Enable build of Caja extensions.
-              "--disable-caja")
+              "--disable-schemas-compile")
       #:tests? #f
       #:phases
       #~(modify-phases %standard-phases
@@ -705,11 +703,13 @@ infamous 'Wanda the Fish'.")
               (substitute* "backend/epub/epub-document.c"
                 (("/usr/share/javascript/mathjax")
                  (string-append #$js-mathjax "/share/javascript/mathjax")))))
-          (add-after 'unpack 'fix-introspection-install-dir
+          (add-after 'unpack 'fix-introspection-and-caja-extension-install-dir
             (lambda _
               (substitute* '("configure")
+                (("`\\$PKG_CONFIG --variable=extensiondir libcaja-extension`")
+                 (string-append "\"" #$output "/lib/caja/extensions-2.0\""))
                 (("\\$\\(\\$PKG_CONFIG --variable=girdir gobject-introspection-1.0\\)")
-                 (string-append "\"" #$output "/share/gir-1.0/\""))
+                 (string-append #$output "/share/gir-1.0/"))
                 (("\\$\\(\\$PKG_CONFIG --variable=typelibdir gobject-introspection-1.0\\)")
                  (string-append #$output "/lib/girepository-1.0/")))))
           (add-before 'install 'skip-gtk-update-icon-cache
