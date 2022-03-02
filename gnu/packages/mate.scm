@@ -70,6 +70,7 @@
   #:use-module (gnu packages pulseaudio)
   #:use-module (gnu packages python)
   #:use-module (gnu packages python-xyz)
+  #:use-module (gnu packages samba)
   #:use-module (gnu packages tex)
   #:use-module (gnu packages webkit)
   #:use-module (gnu packages xdisorg)
@@ -881,28 +882,20 @@ Caja file manager popup menu of selected files.")
        (uri (string-append "mirror://mate/" (version-major+minor version) "/"
                            "caja-extensions-" version ".tar.xz"))
        (sha256
-        (base32 "03zwv3yl5553cnp6jjn7vr4l28dcdhsap7qimlrbvy20119kj5gh"))))
+        (base32 "03zwv3yl5553cnp6jjn7vr4l28dcdhsap7qimlrbvy20119kj5gh"))
+       (patches (search-patches "caja-extensions-call-bindtextdomain-in-library.patch"))))
     (build-system glib-or-gtk-build-system)
     (arguments
      (list #:configure-flags
-           #~(list "--enable-sendto"
-                   ;; TODO: package "gupnp" to enable 'upnp', package
-                   ;; "gksu" to enable 'gksu'.
+           #~(list "--disable-gksu"
                    (string-append "--with-sendto-plugins=removable-devices,"
                                   "caja-burn,emailclient,pidgin,gajim")
-                   "--enable-image-converter"
-                   "--enable-open-terminal"
-                   "--enable-share"
-                   "--enable-wallpaper"
-                   "--enable-xattr-tags"
                    (string-append "--with-cajadir=" #$output
                                   "/lib/caja/extensions-2.0/"))))
     (native-inputs
-     (list intltool
-           gettext-minimal
-           (list glib "bin")
-           gobject-introspection
+     (list gettext-minimal
            gtk-doc
+           intltool
            libxml2
            pkg-config))
     (inputs
@@ -913,10 +906,11 @@ Caja file manager popup menu of selected files.")
            dbus-glib
            gajim ;runtime only?
            gtk+
-           graphicsmagick
            mate-desktop
            pidgin ;runtime only?
            startup-notification))
+    (propagated-inputs
+     (list imagemagick samba))
     (home-page "https://mate-desktop.org/")
     (synopsis "Extensions for the File manager Caja")
     (description
