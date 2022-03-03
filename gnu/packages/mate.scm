@@ -32,6 +32,7 @@
   #:use-module (guix utils)
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system glib-or-gtk)
+  #:use-module (guix build-system meson)
   #:use-module (guix build-system trivial)
   #:use-module (gnu packages)
   #:use-module (gnu packages attr)
@@ -461,6 +462,42 @@ sound systems.")
      "Libmatekbd is a keyboard configuration library for the
 MATE desktop environment.")
     (license license:lgpl2.1)))
+
+(define-public mozo
+  (package
+    (name "mozo")
+    (version "1.26.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "mirror://mate/" (version-major+minor version) "/"
+                           "mozo-" version ".tar.xz"))
+       (sha256
+        (base32 "0fgsy9g2rrzi1bjzaigk7sr447kqv3cr3hy4irld0yq37fd4490g"))
+       (patches (search-patches "mozo-import-and-use-locale-package.patch"))))
+    (build-system meson-build-system)
+    (arguments
+     (list #:phases
+           #~(modify-phases %standard-phases
+               (add-after 'unpack 'skip-gtk-update-icon-cache
+                 ;; Don't create 'icon-theme.cache'.
+                 (lambda _
+                   (substitute* "post_install.py"
+                     (("gtk-update-icon-cache") "true")
+                     (("update-desktop-database") "true")))))))
+    (native-inputs
+     (list gettext-minimal gobject-introspection intltool pkg-config))
+    (inputs
+     (list gtk+ glib))
+    (propagated-inputs
+     (list python-wrapper python-pygobject mate-menus))
+    (home-page "https://mate-desktop.org/")
+    (synopsis "Easy MATE menu editing tool")
+    (description
+     "Mozo is an easy-to-use menu editor for MATE that can add and edit new
+entries and menus. It works with the freedesktop.org menu specification and
+should work with any desktop environment that uses the spec.")
+    (license (list license:gpl2+ license:lgpl2.0+))))
 
 (define-public mate-menus
   (package
