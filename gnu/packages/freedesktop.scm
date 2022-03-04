@@ -848,6 +848,64 @@ GNOME Shell.  The @command{localectl} command-line tool allows you to interact
 with localed.  This package is extracted from the broader systemd package.")
     (license license:lgpl2.1+)))
 
+(define-public timedated
+  (package
+    (inherit localed)
+    (name "timedated")
+    (arguments
+     ;; Try to build as little as possible (list of components taken from the
+     ;; top-level 'meson.build' file.)
+     (let* ((components
+             '("utmp" "hibernate" "environment-d" "binfmt" "coredump"
+               "resolve" "logind" "hostnamed" "localed" "machined"
+               "portabled" "networkd" "localed" "timesyncd" "firstboot"
+               "randomseed" "backlight" "vconsole" "quotacheck" "sysusers"
+               "tmpfiles" "hwdb" "rfkill" "ldconfig" "efi" "tpm" "ima"
+               "smack" "gshadow" "idn" "nss-myhostname" "nss-systemd"))
+            (flags (map (lambda (component)
+                          (string-append "-D" component "=false"))
+                        (delete "timedated" components))))
+       (list
+        ;; It doesn't make sense to test all of systemd.
+        #:tests? #f
+
+        #:configure-flags #~(list #$@flags)
+
+        #:phases
+        #~(modify-phases %standard-phases
+            (replace 'install
+              (lambda _
+                ;; Install 'timedated', the D-Bus and polkit files, and
+                ;; 'localectl'.
+                (define (source-file regexp)
+                  (car (find-files ".." regexp)))
+
+                (install-file "timedatectl" (string-append #$output "/bin"))
+                (let ((libexec (string-append #$output "/libexec/timedated")))
+                  (mkdir-p libexec)
+                  (copy-file "systemd-timedated"
+                             (string-append libexec "/timedated")))
+
+                (let ((service-file (source-file
+                                     "\\.timedate1\\.service$")))
+                  (substitute* service-file
+                    (("^Exec=.*$")
+                     (string-append "Exec=" #$coreutils "/bin/false\n")))
+                  (install-file service-file
+                                (string-append #$output
+                                               "/share/dbus-1/system-services")))
+                (install-file (source-file "\\.timedate1\\.policy$")
+                              (string-append #$output "/share/polkit-1/actions"))
+                (install-file (source-file "\\.timedate1\\.conf$")
+                              (string-append #$output "/etc/dbus-1/system.d/"))
+                (for-each (lambda (file)
+                            (install-file file (string-append #$output "/lib")))
+                          (find-files "src/shared"
+                                      "libsystemd-shared.*\\.so"))))))))
+    (synopsis "xxx")
+    (description
+     "xxx")))
+
 (define-public seatd
   (package
     (name "seatd")
