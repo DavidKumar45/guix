@@ -113,6 +113,10 @@
             localed-configuration?
             localed-service-type
 
+            timedated-configuration
+            timedated-configuration?
+            timedated-service-type
+
             gdm-configuration
             gdm-service-type
 
@@ -802,6 +806,41 @@ makes the good ol' XlockMore usable."
 to control the system locale and keyboard mapping from user programs such as
 the GNOME desktop environment.")
                   (default-value (localed-configuration)))))
+
+
+;;;
+;;; Locale service.
+;;;
+
+(define-record-type* <timedated-configuration>
+  timedated-configuration make-timedated-configuration
+  timedated-configuration?
+  (timedated   timedated-configuration-timedated
+               (default timedated)))
+
+(define (timedated-dbus-service config)
+  "Return the 'timedated' D-Bus service for @var{config}, a
+@code{<timedated-configuration>} record."
+  (list (wrapped-dbus-service
+         (timedated-configuration-timedated config)
+         "libexec/timedated/timedated"
+         '())))
+
+(define timedated-service-type
+  (let ((package (lambda (config)
+                   (list (timedated-configuration-timedated config)))))
+    (service-type (name 'timedated)
+                  (extensions
+                   (list (service-extension dbus-root-service-type
+                                            timedated-dbus-service)
+                         (service-extension polkit-service-type package)
+                         ;; Add 'localectl' to the profile.
+                         (service-extension profile-service-type package)))
+                  (description
+                   "Run the locale daemon, @command{timedated}, which can be used
+to control the system locale and keyboard mapping from user programs such as
+the GNOME desktop environment.")
+                  (default-value (timedated-configuration)))))
 
 
 ;;;
